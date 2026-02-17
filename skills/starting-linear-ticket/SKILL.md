@@ -168,20 +168,53 @@ Set up dependencies with `TaskUpdate` (e.g., verification blocked by implementat
 
 Update task status as you work: `in_progress` when starting, `completed` when done. This gives the user visibility into progress.
 
-### Step 6: Implement with TDD
+### Step 6: Implement with Subagents
 
-**REQUIRED:** Invoke `superpowers:test-driven-development` skill.
+**REQUIRED:** Use subagents (Task tool) to implement each task from the task list.
 
-Follow the design from brainstorming. For each piece of functionality:
-1. RED - Write failing test
-2. GREEN - Minimal code to pass
-3. REFACTOR - Clean up
+After creating the task list in Step 5, dispatch implementation tasks to subagents:
+
+1. **Identify independent tasks** — tasks that don't depend on each other can run in parallel
+2. **Dispatch each task** using `Task` tool with `subagent_type: "general-purpose"`
+3. **Include full context** in each subagent prompt:
+   - The worktree path (so they edit the right files)
+   - Which files to modify and what changes to make
+   - The acceptance criteria for that task
+   - Instructions to follow TDD (RED → GREEN → REFACTOR)
+4. **Run independent tasks in parallel** — launch multiple Task calls in a single message
+5. **Run dependent tasks sequentially** — wait for blockers to complete first
+6. **Update task status** — mark tasks `completed` as subagents finish
+
+**Subagent prompt template:**
+```
+You are working in the worktree at: <worktree-path>
+
+Task: <task description>
+
+Files to modify:
+- <file path> — <what to change>
+
+Acceptance criteria:
+- <criterion 1>
+- <criterion 2>
+
+Follow TDD:
+1. Write failing test first
+2. Implement minimal code to pass
+3. Refactor if needed
+4. Run tests to verify: <test command>
+```
+
+**When NOT to use subagents:**
+- Tasks that require back-and-forth with the user (clarification, approval)
+- Tasks where you need to see the result before deciding next steps
+- Very small changes (1-2 line edits) where the overhead isn't worth it
 
 **Note on test types:** Unit tests are preferred when possible. For UI/visual bugs where e2e tests are flaky or unreliable, document that manual testing will be used in Step 7.
 
 ### Step 7: Verify Before Completion
 
-**REQUIRED:** Invoke `superpowers:verification-before-completion` skill.
+**REQUIRED:** Invoke `superpowers:verification-before-completion` skill, or dispatch a Bash subagent to run verification.
 
 **Automated verification:**
 - Run all tests and verify everything passes
@@ -281,8 +314,8 @@ Report completion with PR URL.
 | 3 | Create worktree | `superpowers:using-git-worktrees` |
 | 4 | Design | `superpowers:brainstorming` |
 | 5 | Create task list | `TaskCreate` + `TaskUpdate` for dependencies |
-| 6 | Implement | `superpowers:test-driven-development` |
-| 7 | Verify (unit + E2E + manual) | `superpowers:verification-before-completion` + E2E tests + local servers |
+| 6 | Implement | Subagents (`Task` tool, `general-purpose`) with TDD |
+| 7 | Verify (unit + E2E + manual) | Subagent (`Bash`) or `superpowers:verification-before-completion` |
 | 8 | Create PR | `gh pr create` |
 | 9 | Code review | `superpowers:code-reviewer` agent → fix Critical/Important issues → present to user |
 | 10 | Check CI | `gh pr checks --watch` → fix failures if any |
@@ -305,6 +338,10 @@ Report completion with PR URL.
 ### Skipping task list before implementation
 - **Problem:** No visibility into progress, user can't see what's being worked on
 - **Fix:** Always create tasks from the design BEFORE writing any code. Update status as you work.
+
+### Implementing tasks sequentially instead of with subagents
+- **Problem:** Doing each task yourself blocks the main context and is slower
+- **Fix:** Dispatch independent implementation tasks to subagents in parallel. Use `Task` tool with `subagent_type: "general-purpose"` and include full context (worktree path, files to modify, acceptance criteria).
 
 ### Skipping TDD for "urgent" tickets
 - **Problem:** Untested code ships with bugs
@@ -350,6 +387,7 @@ Report completion with PR URL.
 - "The code looks fine, I don't need a review"
 - "CI will probably pass, I'll mark it In Review now"
 - "I'll do these 3 tickets one at a time" (if they're independent, use a team)
+- "I'll implement each task myself" (dispatch to subagents for parallelism)
 - "This cross-repo ticket is too complex for a team" (it's exactly when teams help most)
 
 **All of these mean: Follow the workflow. No shortcuts.**
