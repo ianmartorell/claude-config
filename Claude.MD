@@ -8,6 +8,10 @@ If there's even a 1% chance a skill applies, invoke it with the `Skill` tool. Do
 
 **Common skills**: `brainstorming`, `systematic-debugging`, `test-driven-development`, `writing-plans`, `verification-before-completion`, `requesting-code-review`, `using-git-worktrees`, `finishing-a-development-branch`
 
+### Subagents for Implementation
+
+When implementing tasks from a task list, **use subagents** (`Task` tool, `subagent_type: "general-purpose"`) instead of doing each task sequentially yourself. Dispatch independent tasks in parallel. Include full context in each subagent prompt: worktree path, files to modify, acceptance criteria, and TDD instructions. See the `starting-linear-ticket` skill Step 6 for the prompt template.
+
 ---
 
 ## Clarify Before Acting
