@@ -6,7 +6,7 @@
 
 If there's even a 1% chance a skill applies, invoke it with the `Skill` tool. Don't rationalize or skip.
 
-**Common skills**: `brainstorming`, `systematic-debugging`, `test-driven-development`, `writing-plans`, `verification-before-completion`, `requesting-code-review`, `using-git-worktrees`, `finishing-a-development-branch`
+**Common skills**: `brainstorming`, `systematic-debugging`, `test-driven-development`, `writing-plans`, `verification-before-completion`, `requesting-code-review`, `using-git-worktrees`, `finishing-a-development-branch`, `verify-library-api`, `starting-linear-ticket`, `fixtest`
 
 ### Subagents for Implementation
 
