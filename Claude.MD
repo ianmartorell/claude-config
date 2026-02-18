@@ -55,8 +55,6 @@ Do NOT rationalize skipping this ("it's probably X", "I'll just try this approac
 ## Task Tracking with Linear
 
 **Team**: blairsocial
-**Project**: Beta Launch
-**Project URL**: https://linear.app/blairsocial/project/beta-launch-ed7a18f92218
 
 ### When to Create Tasks
 
@@ -69,7 +67,6 @@ mcp__linear-server__create_issue with:
 - title: "Task title"
 - description: "Task description with context"
 - team: "blairsocial"
-- project: "Beta Launch"
 - state: "Backlog"
 - priority: 1-4 (1=Urgent, 2=High, 3=Medium, 4=Low, 0=No priority)
 - labels: ["Bug" | "Feature" | "Improvement"]
