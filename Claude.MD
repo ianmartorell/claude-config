@@ -52,6 +52,17 @@ Do NOT rationalize skipping this ("it's probably X", "I'll just try this approac
 
 ---
 
+## Testing (TDD)
+
+**REQUIRED:** Always use Test-Driven Development. Use the `superpowers:test-driven-development` skill.
+
+- Write tests **before** implementation code — no exceptions
+- Every feature, bug fix, and refactor must include unit tests
+- No PR should be created without passing tests
+- Run `npm test` (or project-equivalent) before committing
+
+---
+
 ## Task Tracking with Linear
 
 The Linear team name is configured per-project in the project's `.claude/CLAUDE.md`.
