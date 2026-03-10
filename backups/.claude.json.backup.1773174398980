@@ -52,7 +52,7 @@
     "overage-promo": 62,
     "feedback-command": 82
   },
-  "promptQueueUseCount": 2383,
+  "promptQueueUseCount": 2392,
   "cachedStatsigGates": {
     "tengu_log_1p_events": true,
     "code_slack_app_install_banner": false,
@@ -684,8 +684,8 @@
   },
   "skillUsage": {
     "superpowers:brainstorming": {
-      "usageCount": 76,
-      "lastUsedAt": 1773166462526
+      "usageCount": 78,
+      "lastUsedAt": 1773172191655
     },
     "superpowers:executing-plans": {
       "usageCount": 1,
@@ -736,8 +736,8 @@
       "lastUsedAt": 1772416746141
     },
     "superpowers:using-git-worktrees": {
-      "usageCount": 98,
-      "lastUsedAt": 1773167692305
+      "usageCount": 100,
+      "lastUsedAt": 1773174314331
     },
     "systematic-debugging": {
       "usageCount": 11,
@@ -748,8 +748,8 @@
       "lastUsedAt": 1770681031931
     },
     "starting-linear-ticket": {
-      "usageCount": 109,
-      "lastUsedAt": 1773167638222
+      "usageCount": 112,
+      "lastUsedAt": 1773174287538
     },
     "superpowers:test-driven-development": {
       "usageCount": 25,

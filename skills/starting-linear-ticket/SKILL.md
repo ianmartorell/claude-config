@@ -96,9 +96,10 @@ digraph workflow {
     pr [label="8. Create PR", shape=box];
     codereview [label="9. Code review", shape=box];
     ci [label="10. Check CI", shape=box];
-    review [label="11. Update Linear\nto In Review", shape=box];
+    localtest [label="11. Local deploy\n(if UI feature)", shape=box, style=dashed];
+    review [label="12. Update Linear\nto In Review", shape=box];
 
-    fetch -> progress -> worktree -> brainstorm -> todos -> tdd -> verify -> pr -> codereview -> ci -> review;
+    fetch -> progress -> worktree -> brainstorm -> todos -> tdd -> verify -> pr -> codereview -> ci -> localtest -> review;
 }
 ```
 
@@ -238,6 +239,15 @@ If the bug is visual or e2e tests are unreliable:
 3. Verify the fix works
 4. Document what was tested in the PR description
 
+**Local deploy for user manual testing:**
+For UI features, new pages, or any user-facing changes — after creating the PR and running code review, offer to deploy locally so the user can manual test:
+1. Ensure required services are running (e.g., `supabase status`)
+2. Copy `.env.local` from main repo to worktree if missing
+3. Start the dev server in the worktree: `npm run dev` (run in background)
+4. Tell the user the URL (e.g., `http://localhost:3000`) and what to test
+5. Wait for user feedback before marking as "In Review"
+6. Stop the dev server after user confirms testing is complete
+
 ### Step 8: Create Pull Request
 
 Push branch and create PR:
@@ -297,7 +307,20 @@ gh pr checks <pr-number> --watch
 gh run view <run-id> --repo <owner/repo> --log-failed
 ```
 
-### Step 11: Update Linear to In Review
+### Step 11: Local Deploy for Manual Testing
+
+**When:** The ticket involves UI features, new pages, or user-facing changes.
+**Skip when:** Backend-only changes, type-only changes, or no visual component.
+
+1. Ensure required services are running (e.g., `supabase status`)
+2. Copy `.env.local` from main repo to worktree if missing
+3. Start the dev server in the worktree (`npm run dev`, run in background)
+4. Tell the user the URL and what to test (specific flows from acceptance criteria)
+5. Wait for user feedback before proceeding
+6. Fix any issues found during manual testing
+7. Stop the dev server after user confirms
+
+### Step 12: Update Linear to In Review
 
 ```
 mcp__linear-server__update_issue with:
@@ -322,7 +345,8 @@ Report completion with PR URL.
 | 8 | Create PR | `gh pr create` |
 | 9 | Code review | `superpowers:code-reviewer` agent → fix Critical/Important issues → present to user |
 | 10 | Check CI | `gh pr checks --watch` → fix failures if any |
-| 11 | Update Linear | `mcp__linear-server__update_issue` → In Review |
+| 11 | Local deploy (if UI) | `npm run dev` in worktree → user manual tests → wait for feedback |
+| 12 | Update Linear | `mcp__linear-server__update_issue` → In Review |
 
 ## Common Mistakes
 

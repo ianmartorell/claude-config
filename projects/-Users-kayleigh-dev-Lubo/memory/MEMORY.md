@@ -42,6 +42,9 @@
 - **Database:** Supabase project `iejvipsxbjxbemxoalje`
 - **NEVER deploy to prod manually** (`vercel --prod`) — let Vercel auto-deploy on merge to main. Use preview deployments from PR branches for testing.
 
+## Tooling
+- **Package manager:** Use `npm` (NOT `bun` — bun is not installed)
+
 ## Repo State
 - Path: `/Users/kayleigh/dev/Lubo` (same as `/Users/kayleigh/Dev/Lubo` — macOS case-insensitive)
 - Git repo, main branch tracks origin/main
