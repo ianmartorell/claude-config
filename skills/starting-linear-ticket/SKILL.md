@@ -89,7 +89,7 @@ digraph workflow {
     fetch [label="1. Fetch ticket", shape=box];
     progress [label="2. Mark In Progress", shape=box];
     worktree [label="3. Create worktree", shape=box];
-    brainstorm [label="4. Brainstorm design", shape=box];
+    brainstorm [label="4. Brainstorm design\n+ Eng Review (execution)", shape=box];
     todos [label="5. Create task list", shape=box];
     tdd [label="6. Implement with TDD", shape=box];
     verify [label="7. Verify (tests + manual)", shape=box];
@@ -141,7 +141,7 @@ Use branch name from Linear if available (`branchName` field), otherwise generat
 
 Where `<slug>` is kebab-case from ticket title.
 
-### Step 4: Brainstorm Design
+### Step 4: Brainstorm Design + Technical Review
 
 **REQUIRED:** Invoke `superpowers:brainstorming` skill.
 
@@ -155,6 +155,18 @@ Brainstorming will:
 - Propose 2-3 approaches with trade-offs
 - Present design incrementally for validation
 - Write design doc to `docs/plans/YYYY-MM-DD-<topic>-design.md`
+
+**After brainstorming completes:**
+
+**REQUIRED SUB-SKILL:** Invoke `plan-review-eng` in **execution mode**
+
+This reviews the design for code quality, test strategy, and performance — concerns that are best addressed when you're in the worktree looking at actual code. The review produces:
+- Edge cases to handle
+- Codepath diagram with test coverage mapping
+- Performance concerns
+- Updated test plan matching acceptance criteria
+
+The test plan from this review feeds directly into Step 6 (TDD implementation).
 
 ### Step 5: Create Task List
 
@@ -338,7 +350,7 @@ Report completion with PR URL.
 | 1 | Fetch ticket | `mcp__linear-server__get_issue` |
 | 2 | Mark in progress | `mcp__linear-server__update_issue` |
 | 3 | Create worktree | `superpowers:using-git-worktrees` |
-| 4 | Design | `superpowers:brainstorming` |
+| 4 | Design + Technical Review | `superpowers:brainstorming` then `plan-review-eng` (execution mode) |
 | 5 | Create task list | `TaskCreate` + `TaskUpdate` for dependencies |
 | 6 | Implement | Subagents (`Task` tool, `general-purpose`) with TDD |
 | 7 | Verify (unit + E2E + manual) | Subagent (`Bash`) or `superpowers:verification-before-completion` |
