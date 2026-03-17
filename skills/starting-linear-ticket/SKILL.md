@@ -99,7 +99,9 @@ digraph workflow {
     localtest [label="11. Local deploy\n(if UI feature)", shape=box, style=dashed];
     review [label="12. Update Linear\nto In Review", shape=box];
 
-    fetch -> progress -> worktree -> brainstorm -> todos -> tdd -> verify -> pr -> codereview -> ci -> localtest -> review;
+    merge [label="13. Merge & Cleanup\n(/merge)", shape=box, style=dashed];
+
+    fetch -> progress -> worktree -> brainstorm -> todos -> tdd -> verify -> pr -> codereview -> ci -> localtest -> review -> merge;
 }
 ```
 
@@ -359,6 +361,7 @@ Report completion with PR URL.
 | 10 | Check CI | `gh pr checks --watch` → fix failures if any |
 | 11 | Local deploy (if UI) | `npm run dev` in worktree → user manual tests → wait for feedback |
 | 12 | Update Linear | `mcp__linear-server__update_issue` → In Review |
+| 13 | Merge & Cleanup | `gh pr merge --squash` → Linear Done → worktree remove → pull main |
 
 ## Common Mistakes
 
@@ -432,31 +435,52 @@ Report completion with PR URL.
 - "I'll do these 3 tickets one at a time" (if they're independent, use a team)
 - "I'll implement each task myself" (dispatch to subagents for parallelism)
 - "This cross-repo ticket is too complex for a team" (it's exactly when teams help most)
+- "The PR is merged, we're done" (still need: Linear → Done, worktree cleanup, pull main)
 
 **All of these mean: Follow the workflow. No shortcuts.**
 
-## After PR Merged
+### Step 13: Merge & Cleanup
 
-**REQUIRED:** Complete cleanup when user says "merge" or PR is merged:
+**Trigger:** User says "merge", "merge the PR", or "ship it". Can also be invoked directly mid-conversation for any open PR.
 
-1. **Merge the PR** (if not already merged):
+**This is the complete end-of-ticket ceremony. Execute all steps in order — don't skip any.**
+
+1. **Confirm PR number** with the user if ambiguous (multiple PRs open)
+
+2. **Verify CI is green:**
+   ```bash
+   gh pr checks <pr-number>
+   ```
+   If checks are failing, fix first — do NOT merge with red CI.
+
+3. **Merge the PR:**
    ```bash
    gh pr merge <pr-number> --squash --delete-branch
    ```
 
-2. **Stop any running servers** started during verification
+4. **Stop any running servers** started during verification (dev servers, Supabase, etc.)
 
-3. **Clean up worktree:**
+5. **Clean up worktree:**
    ```bash
    git worktree remove <worktree-path> --force
    ```
-   Or invoke `superpowers:finishing-a-development-branch` skill.
 
-4. **Update Linear to Done:**
+6. **Return to main and pull latest:**
+   ```bash
+   cd <main-repo-path>
+   git checkout main
+   git pull origin main
    ```
+
+7. **Update Linear to Done:**
+   ```
+   mcp__linear-server__get_issue with id: "<ticket-id>"
    mcp__linear-server__update_issue with:
    - id: "<ticket-id>"
    - state: "Done"
    ```
+   Preserve existing labels (Bug/Feature/Improvement).
 
-**Don't leave worktrees hanging** - they consume disk space and can cause confusion.
+8. **Report completion:** Confirm to user: PR merged, Linear updated, worktree cleaned.
+
+**Don't leave worktrees hanging** — they consume disk space and cause confusion in future sessions.

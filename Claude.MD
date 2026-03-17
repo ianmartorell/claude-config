@@ -38,6 +38,17 @@ Before starting any non-trivial task:
 
 Do NOT rationalize skipping this ("it's probably X", "I'll just try this approach"). The cost of one question is far less than the cost of implementing the wrong thing.
 
+### Pre-Implementation Plan (mandatory)
+
+**Before writing ANY implementation code**, state your plan in 3-5 bullet points and **wait for user approval**:
+
+- **What you'll change** — files, components, endpoints, DB tables
+- **What you WON'T touch** — explicitly call out boundaries
+- **What tools/services you'll use** — Supabase, Railway, specific APIs, etc.
+- **Key design decisions** — approach trade-offs, if any
+
+This applies even when the path seems obvious. Do NOT skip this for "simple" tasks — wrong-approach corrections are the #1 source of wasted time. One checkpoint costs seconds; a wrong approach costs the whole session.
+
 ---
 
 ## Investigate Before Proposing Fixes
