@@ -215,7 +215,7 @@ Shut down team: SendMessage type "shutdown_request" to each agent, then TeamDele
 - **Agents STOP after proposing acceptance criteria** — user must approve before implementation
 - **User approves queue order before starting** — no surprises
 - **Preserve existing Linear labels** when updating issue status
-- **Lead NEVER does implementation directly** — all work (code, tests, fixes, CI debugging) must be delegated to agents or subagents. The lead coordinates, reviews, and communicates with the user.
+- **Lead NEVER does implementation directly** — all work (code, tests, fixes, CI debugging, ad-hoc bugfixes, quick UI tweaks) must be delegated to agents or subagents. The lead coordinates, reviews, and communicates with the user. If the user reports a bug or requests a change during the run, spawn a subagent to fix it — do NOT edit code yourself, even if it seems trivial.
 
 ## Quick Reference
 
