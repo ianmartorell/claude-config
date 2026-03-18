@@ -143,6 +143,10 @@ skill workflow with these modifications:
 
 After Step 11 (Linear updated to In Review), also:
 - Send PR URL, code review summary, and implementation summary to team lead via SendMessage.
+- **Stay alive after submitting PR** — do NOT exit. Wait for feedback from the
+  team lead. If they request changes, push fixes to YOUR branch and report back.
+  Only shut down when the team lead sends a shutdown request (meaning the PR was
+  merged or cancelled).
 
 ## Important
 - Check the installed version of frameworks in package.json before making
@@ -177,11 +181,12 @@ When an agent completes and reports its PR:
 
 1. Present the PR and code review findings to the user
 2. User reviews (in GitHub or via diffs)
-3. Address any review feedback — send fixes back to agent or fix directly
+3. Address any review feedback — **send feedback to the agent** via SendMessage so they can push fixes to their branch. The agent stays alive for this purpose.
 4. **Wait for user to approve**
 5. Merge: `gh pr merge <number> --squash --delete-branch`
 6. Clean up worktree
 7. Update Linear issue to "Done"
+8. **Shut down the agent** — send shutdown_request only after merge
 
 **Do this per-PR as they finish** — don't wait for all agents to complete.
 
