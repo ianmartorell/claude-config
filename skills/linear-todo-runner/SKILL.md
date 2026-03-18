@@ -157,7 +157,7 @@ After Step 11 (Linear updated to In Review), also:
 Each agent sends proposed acceptance criteria via SendMessage. The lead:
 
 1. Receives criteria from each agent
-2. Presents criteria to the user as they arrive (or batches if multiple come in close together)
+2. Presents criteria to the user **one at a time** — do NOT batch multiple agents' criteria into a single message. Present one, wait for the user's response, then present the next.
 3. User approves, modifies, or rejects each
 4. Lead sends approval (or revised criteria) back to each agent via SendMessage
 
