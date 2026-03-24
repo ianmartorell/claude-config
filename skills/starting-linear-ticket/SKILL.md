@@ -388,11 +388,11 @@ Report completion with PR URL.
 | 6 | Implement | Subagents (`Task` tool, `general-purpose`) with TDD |
 | 7 | Verify (unit + E2E + manual) | Subagent (`Bash`) or `superpowers:verification-before-completion` |
 | 8 | Create PR | `gh pr create` |
-| 9 | Code review | `superpowers:code-reviewer` agent → fix Critical/Important issues → present to user |
+| 9 | Code review | Project `scaled-code-review` skill (if exists) OR `superpowers:code-reviewer` agent |
 | 10 | Check CI | `gh pr checks --watch` → fix failures if any |
 | 11 | Local deploy (if UI) | `npm run dev` in worktree → user manual tests → wait for feedback |
 | 12 | Update Linear | `mcp__linear-server__update_issue` → In Review |
-| 13 | Merge & Cleanup | `gh pr merge --squash` → Linear Done → worktree remove → pull main |
+| 13 | Merge, Deploy & Cleanup | Project `land-and-deploy` skill (if exists) OR `gh pr merge --squash` → deploy verify → canary → Linear Done → worktree remove → pull main |
 
 ## Common Mistakes
 
@@ -470,11 +470,13 @@ Report completion with PR URL.
 
 **All of these mean: Follow the workflow. No shortcuts.**
 
-### Step 13: Merge & Cleanup
+### Step 13: Merge, Deploy & Cleanup
 
 **Trigger:** User says "merge", "merge the PR", or "ship it". Can also be invoked directly mid-conversation for any open PR.
 
 **This is the complete end-of-ticket ceremony. Execute all steps in order — don't skip any.**
+
+**Project override:** If the project has a `land-and-deploy` skill, invoke it instead of following the steps below. The project skill handles deploy monitoring and canary verification specific to that project's infrastructure.
 
 1. **Confirm PR number** with the user if ambiguous (multiple PRs open)
 
@@ -489,21 +491,30 @@ Report completion with PR URL.
    gh pr merge <pr-number> --squash --delete-branch
    ```
 
-4. **Stop any running servers** started during verification (dev servers, Supabase, etc.)
+4. **Monitor deploy** (if project has deploy infrastructure):
+   - Wait for deployment to complete (check GitHub deployment status or platform CLI)
+   - Verify deployment succeeded before proceeding
 
-5. **Clean up worktree:**
+5. **Canary verification** (if project has a `canary` skill):
+   - Invoke the project's `canary` skill to verify production health
+   - If canary reports degradation, alert user and offer revert
+   - If healthy, proceed to cleanup
+
+6. **Stop any running servers** started during verification (dev servers, Supabase, etc.)
+
+7. **Clean up worktree:**
    ```bash
    git worktree remove <worktree-path> --force
    ```
 
-6. **Return to main and pull latest:**
+8. **Return to main and pull latest:**
    ```bash
    cd <main-repo-path>
    git checkout main
    git pull origin main
    ```
 
-7. **Update Linear to Done:**
+9. **Update Linear to Done:**
    ```
    mcp__linear-server__get_issue with id: "<ticket-id>"
    mcp__linear-server__update_issue with:
@@ -512,6 +523,6 @@ Report completion with PR URL.
    ```
    Preserve existing labels (Bug/Feature/Improvement).
 
-8. **Report completion:** Confirm to user: PR merged, Linear updated, worktree cleaned.
+10. **Report completion:** Confirm to user: PR merged, deploy verified, Linear updated, worktree cleaned.
 
 **Don't leave worktrees hanging** — they consume disk space and cause confusion in future sessions.
