@@ -163,3 +163,8 @@ Projects can also define their own skills in `.claude/skills/` that override or 
 **Trust but verify.** Subagents handle implementation autonomously, but must run verification gates (tests, type checks, linting) and report evidence before claiming success. The lead agent never writes code directly.
 
 **Memory as feedback loop.** Corrections and confirmed approaches are saved as memories so the same guidance doesn't need to be repeated across conversations. General workflow learnings stay global; project-specific details stay in project repos.
+
+## Acknowledgments
+
+- **[superpowers](https://github.com/garyelliot/superpowers)** by [Gary Elliot](https://github.com/garyelliot) — the Claude Code plugin that provides the foundational workflow disciplines (TDD, brainstorming, debugging, code review, worktrees, etc.) that everything here builds on
+- **[gstack](https://github.com/garrytan/gstack)** by [Garry Tan](https://github.com/garrytan) — many of the custom skills in this repo (Linear ticket workflows, plan reviews, todo runner) were inspired by patterns from gstack
