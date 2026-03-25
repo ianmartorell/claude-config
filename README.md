@@ -19,6 +19,44 @@ My global [Claude Code](https://docs.anthropic.com/en/docs/claude-code) configur
     └── -Users-.../memory/
 ```
 
+## Overall Workflow
+
+The full development lifecycle, from idea to shipped feature:
+
+```
+Idea
+ → creating-linear-tickets
+     → Brainstorm (superpowers:brainstorming)
+     → CEO Review (plan-review-ceo): EXPAND → HOLD → REDUCE
+     → Eng Review (plan-review-eng): architecture, deps, failure modes
+     → Create Linear tickets with acceptance criteria
+
+Ticket ready to build
+ → starting-linear-ticket
+     → Fetch ticket from Linear, mark In Progress
+     → Create git worktree (superpowers:using-git-worktrees)
+     → Brainstorm design + Eng Review (execution mode)
+     → Create task list, dispatch to subagents in parallel
+     → Each subagent: TDD (write test → implement → refactor)
+     → Verify (superpowers:verification-before-completion)
+     → Create PR, run code review (superpowers:code-reviewer)
+     → Check CI, update Linear to In Review
+
+Multiple tickets ready
+ → linear-todo-runner
+     → Fetch all Todo issues, map dependencies
+     → Present queue for approval
+     → Run rolling queue of up to 4 parallel agents
+     → Each agent runs the full starting-linear-ticket workflow
+     → Merge PRs as they complete, fill freed slots
+
+PR approved
+ → Merge, monitor deploy, run canary checks
+ → Clean up worktree, update Linear to Done
+```
+
+At every stage, the superpowers plugin provides the foundational disciplines: TDD, systematic debugging, verification gates, structured brainstorming, and code review.
+
 ## Global Instructions (`Claude.MD`)
 
 The main config file. Sets behavioral rules that apply to every project:
@@ -96,7 +134,9 @@ Memory lives in `projects/<encoded-path>/memory/`. Each project gets its own mem
 
 ## Superpowers Plugin
 
-The [superpowers](https://github.com/anthropics/claude-code-superpowers) plugin adds foundational workflow skills that the custom skills build on:
+This config builds heavily on [superpowers](https://github.com/garyelliot/superpowers) by [Gary Elliot](https://github.com/garyelliot) — a Claude Code plugin that provides foundational workflow disciplines. The custom skills in this repo are designed to layer on top of superpowers, not replace it. Without it, the ticket workflows, brainstorming, TDD enforcement, and code review steps wouldn't exist.
+
+Superpowers skills used throughout:
 
 - `brainstorming` — structured exploration before implementation
 - `test-driven-development` — RED → GREEN → REFACTOR cycle
