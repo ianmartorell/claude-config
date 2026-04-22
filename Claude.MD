@@ -246,7 +246,7 @@ When completing tasks, update:
 
 **After modifying files in `~/.claude/`** (CLAUDE.md, skills, project settings):
 
-The `~/.claude/` directory is a separate git repo (`kmigdol/claude-config`). Changes must be pushed there (not to project repos):
+The `~/.claude/` directory is a separate git repo (`ianmartorell/claude-config`, forked from `kmigdol/claude-config`). Changes must be pushed there (not to project repos):
 
 ```bash
 cd ~/.claude && git add -A && git commit -m "<description>" && git push
