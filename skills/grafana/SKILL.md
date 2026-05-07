@@ -14,7 +14,8 @@ Pick the Grafana instance based on the current project directory:
 |---|---|---|
 | `ecommerce*` | `GRAFANA_RAPIDAND_API_KEY` | rapidand.grafana.net |
 | `customs*` | `GRAFANA_CUSTOMS_API_KEY` | rapidcustoms.grafana.net |
-| anything else | `GRAFANA_SLNC_API_KEY` | slnc.grafana.net |
+
+If the project doesn't match any row, ask the user which instance to use rather than guessing.
 
 ## API Key Handling (CRITICAL - no leaks)
 1. **Load the key into a shell variable in every Bash call.** Keys live in `~/.env`. Always start commands with:
@@ -98,6 +99,8 @@ curl -s -G -H "Authorization: Bearer $GK" \
 
 ## Querying Loki Logs
 Proxy endpoint: `/api/datasources/proxy/uid/<datasource-uid>/loki/api/v1/query_range`
+
+**Always query through the Grafana DS proxy** (`https://<instance>.grafana.net/api/datasources/proxy/...`). The direct Loki ingester host (e.g. `logs-prod-eu-west-2.grafana.net`) is fronted by Cloudflare and returns `530 / error 1016` for queries — it accepts ingest writes only, not reads from your service-account API key.
 
 ### Search logs by text
 ```bash
