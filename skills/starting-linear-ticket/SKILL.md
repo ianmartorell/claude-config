@@ -93,11 +93,11 @@ digraph workflow {
     todos [label="5. Create task list", shape=box];
     tdd [label="6. Implement with TDD", shape=box];
     verify [label="7. Verify (tests + manual)", shape=box];
-    pr [label="8. Create PR\n+ schedule /address-pr-reviews\n(15 min later)", shape=box];
+    pr [label="8. Create PR", shape=box];
     codereview [label="9. Code review", shape=box];
     ci [label="10. Check CI", shape=box];
     localtest [label="11. Local deploy\n(if UI feature)", shape=box, style=dashed];
-    review [label="12. Update Linear\nto In Review", shape=box];
+    review [label="12. Update Linear to In Review\n+ schedule /address-pr-reviews\n(15 min later)", shape=box];
 
     merge [label="13. Merge & Cleanup\n(/merge)", shape=box, style=dashed];
 
@@ -317,41 +317,6 @@ EOF
 
 Capture the PR URL from output.
 
-**Schedule delayed `/address-pr-reviews` run:**
-
-Immediately after capturing the PR URL, schedule a one-time remote agent to run `/address-pr-reviews <PR_URL>` 15 minutes from now. This gives CodeRabbit, Bugbot, and other automated reviewers time to leave their threads before the agent picks them up. Do not skip this — it runs in parallel with the rest of the workflow (Steps 9–12 continue locally) and catches bot feedback that arrives after the local code-reviewer agent has already finished.
-
-1. Load `RemoteTrigger` with `ToolSearch select:RemoteTrigger`.
-2. Get the current UTC time with `date -u +%Y-%m-%dT%H:%M:%SZ` and add 15 minutes to compute `run_once_at` (RFC3339 UTC).
-3. Call `RemoteTrigger` with `action: "create"` and body:
-   ```json
-   {
-     "name": "Address PR reviews — <PROJ>-<number>",
-     "run_once_at": "<UTC timestamp 15 min from now>",
-     "enabled": true,
-     "job_config": {
-       "ccr": {
-         "environment_id": "env_01GmqoAszHe6kDXEtYnnphu2",
-         "session_context": {
-           "model": "claude-sonnet-4-6",
-           "sources": [{"git_repository": {"url": "<repo HTTPS URL>"}}],
-           "allowed_tools": ["Bash", "Read", "Write", "Edit", "Glob", "Grep"]
-         },
-         "events": [{"data": {
-           "uuid": "<fresh lowercase v4 uuid>",
-           "session_id": "",
-           "type": "user",
-           "parent_tool_use_id": null,
-           "message": {"content": "/address-pr-reviews <PR_URL>", "role": "user"}
-         }}]
-       }
-     }
-   }
-   ```
-4. Report the routine ID and `https://claude.ai/code/routines/<ROUTINE_ID>` link alongside the PR URL so the user can monitor or cancel it.
-
-**Note:** This is a remote agent — it cannot access the local worktree. `/address-pr-reviews` runs against the merged branch on a fresh checkout, which is fine because PR review threads reference line numbers in the pushed commits.
-
 ### Step 9: Code Review
 
 **REQUIRED:** Invoke `superpowers:requesting-code-review` skill OR use the `superpowers:code-reviewer` agent.
@@ -409,6 +374,41 @@ mcp__linear-server__update_issue with:
 - description: append PR link to existing description
 ```
 
+**Schedule delayed `/address-pr-reviews` run:**
+
+Local work on the branch is done at this point — schedule a one-time remote agent to run `/address-pr-reviews <PR_URL>` 15 minutes from now. This gives CodeRabbit, Bugbot, and other automated reviewers time to leave their threads, then has the remote agent handle them. Scheduling here (rather than at PR creation) avoids racing local pushes against the remote agent's pushes.
+
+1. Load `RemoteTrigger` with `ToolSearch select:RemoteTrigger`.
+2. Get the current UTC time with `date -u +%Y-%m-%dT%H:%M:%SZ` and add 15 minutes to compute `run_once_at` (RFC3339 UTC).
+3. Call `RemoteTrigger` with `action: "create"` and body:
+   ```json
+   {
+     "name": "Address PR reviews — <PROJ>-<number>",
+     "run_once_at": "<UTC timestamp 15 min from now>",
+     "enabled": true,
+     "job_config": {
+       "ccr": {
+         "environment_id": "<cloud env id>",
+         "session_context": {
+           "model": "claude-sonnet-4-6",
+           "sources": [{"git_repository": {"url": "<repo HTTPS URL>"}}],
+           "allowed_tools": ["Bash", "Read", "Write", "Edit", "Glob", "Grep"]
+         },
+         "events": [{"data": {
+           "uuid": "<fresh lowercase v4 uuid>",
+           "session_id": "",
+           "type": "user",
+           "parent_tool_use_id": null,
+           "message": {"content": "/address-pr-reviews <PR_URL>", "role": "user"}
+         }}]
+       }
+     }
+   }
+   ```
+4. Report the routine ID and `https://claude.ai/code/routines/<ROUTINE_ID>` link alongside the PR URL so the user can monitor or cancel it.
+
+**Note:** This is a remote agent — it cannot access the local worktree. `/address-pr-reviews` runs on a fresh clone, which works because PR review threads reference line numbers in the pushed commits.
+
 Report completion with PR URL.
 
 ## Quick Reference
@@ -422,11 +422,11 @@ Report completion with PR URL.
 | 5 | Create task list | `TaskCreate` + `TaskUpdate` for dependencies |
 | 6 | Implement | Subagents (`Task` tool, `general-purpose`) with TDD |
 | 7 | Verify (unit + E2E + manual) | Subagent (`Bash`) or `superpowers:verification-before-completion` |
-| 8 | Create PR + schedule delayed `/address-pr-reviews` | `gh pr create`, then `RemoteTrigger` with `run_once_at` = now + 15 min |
+| 8 | Create PR | `gh pr create` |
 | 9 | Code review | Project `scaled-code-review` skill (if exists) OR `superpowers:code-reviewer` agent |
 | 10 | Check CI | `gh pr checks --watch` → fix failures if any |
 | 11 | Local deploy (if UI) | `npm run dev` in worktree → user manual tests → wait for feedback |
-| 12 | Update Linear | `mcp__linear-server__update_issue` → In Review |
+| 12 | Update Linear + schedule delayed `/address-pr-reviews` | `mcp__linear-server__update_issue` → In Review, then `RemoteTrigger` with `run_once_at` = now + 15 min |
 | 13 | Merge, Deploy & Cleanup | Project `land-and-deploy` skill (if exists) OR `gh pr merge --squash` → deploy verify → canary → Linear Done → worktree remove → pull main |
 
 ## Common Mistakes
