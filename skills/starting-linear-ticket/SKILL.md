@@ -388,7 +388,7 @@ Local work on the branch is done at this point — schedule a one-time remote ag
      "enabled": true,
      "job_config": {
        "ccr": {
-         "environment_id": "<cloud env id>",
+         "environment_id": "env_01GmqoAszHe6kDXEtYnnphu2",
          "session_context": {
            "model": "claude-sonnet-4-6",
            "sources": [{"git_repository": {"url": "<repo HTTPS URL>"}}],
@@ -408,6 +408,8 @@ Local work on the branch is done at this point — schedule a one-time remote ag
 4. Report the routine ID and `https://claude.ai/code/routines/<ROUTINE_ID>` link alongside the PR URL so the user can monitor or cancel it.
 
 **Note:** This is a remote agent — it cannot access the local worktree. `/address-pr-reviews` runs on a fresh clone, which works because PR review threads reference line numbers in the pushed commits.
+
+**Env ID:** Uses the Default env (`env_01GmqoAszHe6kDXEtYnnphu2`), which has no `.env.and` secrets or Postgres. Fine for typo / naming / docs-style review fixes. For fixes that need `make check` or tests to pass, swap in a project-specific env ID (e.g. the user's `ecommerce` env with the bootstrap script — see `docs/claude-cloud-env.md` if present).
 
 Report completion with PR URL.
 
