@@ -214,6 +214,15 @@ The `starting-linear-ticket` skill has full team setup details.
 - Run tests locally before pushing
 - Verify CI passes
 
+### After Opening a PR (always)
+
+**Every time** I open a PR (via `gh pr create`), do both of these without being asked:
+
+1. **Watch CI to completion.** Run `gh pr checks <pr-number> --watch`. If any check fails, read the failure (`gh run view <run-id> --log-failed`), fix it, push, and re-watch. Don't leave a PR sitting on red CI.
+2. **Schedule the first `/address-pr-reviews` pass for 10 minutes after the PR is opened.** This gives automated reviewers (CodeRabbit, Cursor Bugbot, etc.) time to post their threads first. Use `ScheduleWakeup` (in-session) or `RemoteTrigger` with `run_once_at = PR-open time + 10 min` (see `starting-linear-ticket` Step 12 for the RemoteTrigger payload). When it fires, run the `/address-pr-reviews` skill against the PR URL and keep addressing threads until they're resolved.
+
+This applies to **all** PRs, not just Linear-ticket work. It is a behavioral default I follow within a session — it is not a deterministic hook, so if a session ends before the 10-min mark, the scheduled remote run (RemoteTrigger) is what carries it forward.
+
 ### Merging
 
 **🚨 NEVER MERGE WITHOUT EXPLICIT USER APPROVAL 🚨**
