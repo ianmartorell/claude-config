@@ -216,10 +216,11 @@ The `starting-linear-ticket` skill has full team setup details.
 
 ### After Opening a PR (always)
 
-**Every time** I open a PR (via `gh pr create`), do both of these without being asked:
+**Every time** I open a PR (via `gh pr create`), do all of these without being asked:
 
 1. **Watch CI to completion.** Run `gh pr checks <pr-number> --watch`. If any check fails, read the failure (`gh run view <run-id> --log-failed`), fix it, push, and re-watch. Don't leave a PR sitting on red CI.
 2. **Schedule the first `/address-pr-reviews` pass for 10 minutes after the PR is opened.** This gives automated reviewers (CodeRabbit, Cursor Bugbot, etc.) time to post their threads first. Use `ScheduleWakeup` (in-session) or `RemoteTrigger` with `run_once_at = PR-open time + 10 min` (see `starting-linear-ticket` Step 12 for the RemoteTrigger payload). When it fires, run the `/address-pr-reviews` skill against the PR URL and keep addressing threads until they're resolved.
+3. **Post verification screenshots to the PR.** If verifying the change (e.g. via the `verify` skill) produced screenshots or recordings, post them as a PR comment — don't leave them only in the chat. For private repos, push the images to an orphan `screenshots/<topic>` branch (git plumbing: `git hash-object -w` each file + `git mktree` + parentless `git commit-tree`, then `git push origin <sha>:refs/heads/screenshots/<topic>`) and embed them with `https://github.com/<owner>/<repo>/raw/screenshots/<topic>/<file>.png` URLs — those render inline for repo members, unlike `raw.githubusercontent.com` links, which break behind GitHub's camo proxy on private repos. Note in the comment that the branch is safe to delete after merge.
 
 This applies to **all** PRs, not just Linear-ticket work. It is a behavioral default I follow within a session — it is not a deterministic hook, so if a session ends before the 10-min mark, the scheduled remote run (RemoteTrigger) is what carries it forward.
 
