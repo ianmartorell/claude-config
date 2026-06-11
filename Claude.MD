@@ -224,6 +224,8 @@ The `starting-linear-ticket` skill has full team setup details.
 
 This applies to **all** PRs, not just Linear-ticket work. It is a behavioral default I follow within a session — it is not a deterministic hook, so if a session ends before the 10-min mark, the scheduled remote run (RemoteTrigger) is what carries it forward.
 
+**Never assign reviewers automatically.** Do not add reviewers (individuals or teams) to a PR unless the user explicitly asks for it — even if project docs describe a default reviewer-assignment convention; that is for the user to apply manually.
+
 ### Merging
 
 **🚨 NEVER MERGE WITHOUT EXPLICIT USER APPROVAL 🚨**
